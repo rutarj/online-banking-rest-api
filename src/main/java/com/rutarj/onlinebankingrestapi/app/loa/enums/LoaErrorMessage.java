@@ -40,6 +40,12 @@ public enum LoaErrorMessage implements BaseErrorMessage {
             , "Please enter an installment count that is smaller than the limit:" ),
     LOAN_ALREADY_PAID_OFF("Loan is already paid off"
             , "Please be sure that you entered correct loan id." ),
+    ANNUAL_INCOME_MUST_BE_POSITIVE("Annual income must be positive"
+            , "Please enter annualIncome greater than zero."),
+    CREDIT_SCORE_OUT_OF_RANGE("Credit score is out of valid range"
+            , "Please enter a creditScore between 300 and 900."),
+    REQUESTED_AMOUNT_MUST_BE_POSITIVE("Requested amount must be positive"
+            , "Please enter requestedAmount greater than zero."),
     ;
 
     private  final String message;
