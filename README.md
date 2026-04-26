@@ -15,7 +15,8 @@ This project focuses on understanding, configuring, and extending an existing Ja
 
 ### Loan Eligibility Checker
 
-![Loan Eligibility Checker](image2.png)
+<img width="982" height="936" alt="image" src="https://github.com/user-attachments/assets/72c1ff88-1816-443d-990f-78ed6253ddd1" />
+
 
 ---
 
