@@ -96,4 +96,18 @@ public class LoaLoanController {
         return ResponseEntity.ok(RestResponse.of(loaPayLoanOffResponseDto));
     }
 
+    @Operation(
+            tags = "Loan Controller",
+            summary = "Check loan eligibility.",
+            description = "Checks if customer is eligible for requested loan amount."
+    )
+    @PostMapping("/eligibility")
+    public ResponseEntity<RestResponse<LoaLoanEligibilityResponseDto>> checkEligibility(
+            @RequestBody LoaLoanEligibilityRequestDto requestDto){
+
+        LoaLoanEligibilityResponseDto responseDto = loaLoanService.checkEligibility(requestDto);
+
+        return ResponseEntity.ok(RestResponse.of(responseDto));
+    }
+
 }

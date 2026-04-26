@@ -169,4 +169,32 @@ public class LoaLoanValidationService {
             throw new IllegalFieldException(LoaErrorMessage.LOAN_ALREADY_PAID_OFF);
         }
     }
+
+    public void controlIsEligibilityRequestValid(LoaLoanEligibilityRequestDto requestDto) {
+
+        boolean hasNull = requestDto == null
+                || requestDto.getCustomerId() == null
+                || requestDto.getAnnualIncome() == null
+                || requestDto.getCreditScore() == null
+                || requestDto.getRequestedAmount() == null;
+
+        if (hasNull) {
+            throw new IllegalFieldException(LoaErrorMessage.PARAMETER_CANNOT_BE_NULL);
+        }
+
+        controlIsCustomerExist(requestDto.getCustomerId());
+
+        if (requestDto.getAnnualIncome().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalFieldException(LoaErrorMessage.ANNUAL_INCOME_MUST_BE_POSITIVE);
+        }
+
+        if (requestDto.getRequestedAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalFieldException(LoaErrorMessage.REQUESTED_AMOUNT_MUST_BE_POSITIVE);
+        }
+
+        Integer creditScore = requestDto.getCreditScore();
+        if (creditScore < 300 || creditScore > 900) {
+            throw new IllegalFieldException(LoaErrorMessage.CREDIT_SCORE_OUT_OF_RANGE);
+        }
+    }
 }

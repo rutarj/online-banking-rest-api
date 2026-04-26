@@ -29,6 +29,10 @@ public class LoaLoanService {
     private final BigDecimal TAX_RATE = BigDecimal.valueOf(20/100); //KKDF + BSMV
     private final BigDecimal ALLOCATION_FEE = BigDecimal.valueOf(45);
     private final int INSTALLMENT_COUNT_LIMIT = 360;
+    private static final BigDecimal ELIGIBILITY_RATE = BigDecimal.valueOf(0.30);
+    private static final int MIN_ELIGIBLE_CREDIT_SCORE = 700;
+    private static final int RATE_800_THRESHOLD = 800;
+    private static final int RATE_750_THRESHOLD = 750;
 
     public LoaCalculateLoanResponseDto calculateLoan(Integer installment, BigDecimal principalLoanAmount) {
 
@@ -263,5 +267,59 @@ public class LoaLoanService {
         loaPayLoanOffResponseDto.setPaidAmount(paidAmount);
 
         return loaPayLoanOffResponseDto;
+    }
+
+    public LoaLoanEligibilityResponseDto checkEligibility(LoaLoanEligibilityRequestDto requestDto) {
+
+        loaLoanValidationService.controlIsEligibilityRequestValid(requestDto);
+
+        BigDecimal maxAmount = requestDto.getAnnualIncome()
+                .multiply(ELIGIBILITY_RATE)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        Integer creditScore = requestDto.getCreditScore();
+        BigDecimal requestedAmount = requestDto.getRequestedAmount();
+
+        boolean isCreditScoreLow = creditScore < MIN_ELIGIBLE_CREDIT_SCORE;
+        boolean isAmountExceedingLimit = requestedAmount.compareTo(maxAmount) > 0;
+
+        boolean isEligible = !isCreditScoreLow && !isAmountExceedingLimit;
+
+        BigDecimal interestRate = resolveInterestRate(creditScore);
+        String reason = resolveEligibilityReason(isCreditScoreLow, isAmountExceedingLimit);
+
+        LoaLoanEligibilityResponseDto responseDto = new LoaLoanEligibilityResponseDto();
+        responseDto.setEligible(isEligible);
+        responseDto.setMaxAmount(maxAmount);
+        responseDto.setInterestRate(interestRate);
+        responseDto.setReason(reason);
+
+        return responseDto;
+    }
+
+    private BigDecimal resolveInterestRate(Integer creditScore) {
+        if (creditScore >= RATE_800_THRESHOLD) {
+            return BigDecimal.valueOf(4).setScale(2, RoundingMode.HALF_UP);
+        }
+        if (creditScore >= RATE_750_THRESHOLD) {
+            return BigDecimal.valueOf(6).setScale(2, RoundingMode.HALF_UP);
+        }
+        if (creditScore >= MIN_ELIGIBLE_CREDIT_SCORE) {
+            return BigDecimal.valueOf(8).setScale(2, RoundingMode.HALF_UP);
+        }
+        return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private String resolveEligibilityReason(boolean isCreditScoreLow, boolean isAmountExceedingLimit) {
+        if (!isCreditScoreLow && !isAmountExceedingLimit) {
+            return "Eligible for requested loan amount.";
+        }
+        if (isCreditScoreLow && isAmountExceedingLimit) {
+            return "Credit score is below minimum requirement and requested amount exceeds maximum eligible amount.";
+        }
+        if (isCreditScoreLow) {
+            return "Credit score is below minimum requirement.";
+        }
+        return "Requested amount exceeds maximum eligible amount.";
     }
 }
