@@ -10,7 +10,8 @@ This project focuses on understanding, configuring, and extending an existing Ja
 
 ### Swagger API Overview
 
-![Swagger API Overview](image1.png)
+<img width="1896" height="946" alt="image" src="https://github.com/user-attachments/assets/3d0e759f-ce1b-4388-ad6b-95551ffa3f33" />
+
 
 ### Loan Eligibility Checker
 
